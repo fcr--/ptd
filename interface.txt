@@ -1,0 +1,13 @@
+Domain: "uy.com.netlabs.ptd"
+/rules
+  int setPidRule(int prio, int pid, bool inherit, int mark);
+  int setProgNameRule(int prio, string progNameRegex, int mark);
+  int setPortRule(int prio, int port, int mark)
+  void delRule(int id);
+  int[] getRules()
+  struct {int prio, int mark, variant rule} getRule(int id);
+
+struct pid_rule {int pid, bool inherit};
+struct progname_rule {string progNameRegex};
+struct port_rule {int port};
+

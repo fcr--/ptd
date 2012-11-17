@@ -1,6 +1,7 @@
 #include <glib.h>
 #include <gio/gio.h>
 #include <stdbool.h>
+#include "rules.h"
 
 static void on_bus_acquired(GDBusConnection * conn, const gchar * name,
     gpointer data) {
@@ -19,10 +20,13 @@ static gboolean on_timer(gpointer data) {
 int main(int argc, char * argv[]) {
   GOptionContext * opt_context;
   GError * opt_error = NULL;
+  const char * opt_rules_config_file = "ptd-rules.ini";
   gint opt_queue_num = 42;
   GOptionEntry opt_entries[] = {
     { "queue-num", 0, 0, G_OPTION_ARG_INT, &opt_queue_num,
       "IPTables NFQUEUE number 1<=N<=32767", "N" },
+    { "rules-config-file", 'c', 0, G_OPTION_ARG_STRING, &opt_rules_config_file,
+      "Filename for ptd-rules.ini", "FILENAME" },
     { NULL },
   };
 
@@ -38,6 +42,9 @@ int main(int argc, char * argv[]) {
     g_printerr("Invalid option: %s\n", argv[1]);
     return 1;
   }
+
+  rules_init();
+  load_config(opt_rules_config_file);
 
   guint owner_id = g_bus_own_name(G_BUS_TYPE_SESSION, "uy.org.netlabs.ptd",
       G_BUS_NAME_OWNER_FLAGS_NONE, on_bus_acquired, on_name_acquired,

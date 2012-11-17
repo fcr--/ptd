@@ -5,13 +5,16 @@ PKGS += gio-2.0
 CFLAGS += `pkg-config --cflags $(PKGS)`
 LIBS += `pkg-config --libs $(PKGS)` -lnetfilter_queue
 
-all: example main
+all: example ptd
 
 example: example.c
 	$(CC) example.c -o example $(CFLAGS) $(LIBS)
 
-main: main.c
-	$(CC) $< -o $@ $(CFLAGS) $(LIBS)
+ptd: main.o rules.o
+	$(CC) $^ -o $@ $(LIBS)
+
+%.o: %.c
+	$(CC) -c $< -o $@ $(CFLAGS)
 
 clean:
-	rm -f example main
+	rm -f example ptd *.o

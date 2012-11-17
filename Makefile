@@ -1,4 +1,4 @@
-CFLAGS += -Wall
+CFLAGS += -Wall -std=c99
 PKGS += glib-2.0
 PKGS += gio-2.0
 
@@ -16,5 +16,14 @@ ptd: main.o rules.o
 %.o: %.c
 	$(CC) -c $< -o $@ $(CFLAGS)
 
+main.c: interface.h
+interface.h: interface.xml
+	echo 'static const char * dbus_interface =' > $@
+	xmllint --valid --noblanks interface.xml | tr -d '\n' | \
+	  sed -e ':a;s/\(.*\)<!--.*-->/\1/;ta;s/'"'/\&quot;/g;" \
+	  -e "s/'\([A-Z_a-z0-9]*\)'/\1/g;"'s/"/'"'/g;"'s/.*/    "&";/' \
+	  >> $@
+	echo >> $@
+
 clean:
-	rm -f example ptd *.o
+	rm -f example ptd *.o interface.h

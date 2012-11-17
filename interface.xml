@@ -1,0 +1,88 @@
+<!DOCTYPE node PUBLIC '-//freedesktop//DTD D-BUS Object Introspection 1.0//EN'
+    'http://www.freedesktop.org/standards/dbus/1.0/introspect.dtd'>
+<node name='/rules'>
+  <!-- This interface provides a set of methods for handling of rules.
+       All the rules have at least the attributes prio and mark, and they
+       are identified by a unique id.
+         When a new outgoing connection is being established it will be
+       intercepted by this 'ptd' (packet tagging daemon), and for all
+       the rules that matches, the one whose priority is the biggest amongst
+       them, will be used to mark the its initial packet. -->
+  <interface name='uy.com.netlabs.ptd.RulesInterface'>
+
+    <!-- setPidRule: With this function the user may create a rule with
+	 the following behaviour:
+	 * If a process with the pid (or a child of that process) establishes
+	   a new connection, then mark will be considered with the given
+	   priority. -->
+    <method name='setPidRule'>
+      <arg name='prio' type='i' direction='in'/>
+      <arg name='pid' type='i' direction='in'/>
+      <arg name='inherit' type='b' direction='in'/>
+      <arg name='mark' type='i' direction='in'/>
+      <arg name='id' type='i' direction='out'/>
+    </method>
+
+    <!-- setPortRule: This function allows the user to create a new rule
+	 based on the name of the application that established the TCP
+	 socket of the connection. -->
+    <method name='setProgNameRule'>
+      <arg name='prio' type='i' direction='in'/>
+      <arg name='progNameRegex' type='s' direction='in'/>
+      <arg name='mark' type='i' direction='in'/>
+      <arg name='id' type='i' direction='out'/>
+    </method>
+
+    <!-- setPortRule: This function allows the user to create a new rule
+	 based on the TCP destination port of new connections. -->
+    <method name='setPortRule'>
+      <arg name='prio' type='i' direction='in'/>
+      <arg name='port' type='i' direction='in'/>
+      <arg name='mark' type='i' direction='in'/>
+      <arg name='id' type='i' direction='out'/>
+    </method>
+
+    <!-- This is commented because it's not gonna be implemented soon,
+	 but it remains as a wish:
+    <method name='setIPRule'>
+      <arg name='prio' type='i' direction='in'/>
+      <arg name='addr' type='s' direction='in'/>
+      <arg name='mask' type='i' direction='in'/>
+      <arg name='mark' type='i' direction='in'/>
+    </method> -->
+
+    <!-- delRule: This method allows rule deletion. -->
+    <method name='delRule'>
+      <arg name='id' type='i' direction='in'/>
+    </method>
+
+    <!-- getRulesId: Returns a list with the id of the rules loaded in
+	 the daemon. -->
+    <method name='getRulesId'>
+      <arg name='ids' type='ai' direction='out'/>
+    </method>
+
+    <!-- getRule: Returns the specification of a rule. Rules are always
+	 immutables, so once it's defined it won't change. You can use
+	 this function to obtain its parameters.
+	   Because this interface format isn't expressive enought, we
+	 specify here what every parameter in the struct rule of type
+	 (iisv) means:
+	 * prio: returns its priority.
+	 * mark: returns its associated mark.
+	 * type: a string indicating the constructor used to create the rule,
+		 after using this string to do pattern matching you can fetch
+		 the rule specific parameters. It may be one of:
+		   'pid', 'progName', 'port' or 'ip'.
+	 * rule: depending on the previous parameter 'type', it will be a
+	   struct with the following list of subfields:
+	   * pid: <arg name='pid' type='i'/> <arg name='inherit' type='b'/>
+	   * progName: <arg name='progNameRegex' type='s'/>
+	   * port: <arg name='port' type='i'/>
+	   * ip: <arg name='ip' type='s'/> <arg name='mask' type='i'/> -->
+    <method name='getRule'>
+      <arg name='id' type='i' direction='in'/>
+      <arg name='rule' type='(iisv)' direction='out'/>
+    </method>
+  </interface>
+</node>

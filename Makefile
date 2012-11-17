@@ -1,7 +1,9 @@
 CFLAGS += -Wall
+PKGS += glib-2.0
+PKGS += gio-2.0
 
-CFLAGS += `pkg-config --cflags glib-2.0`
-LIBS += `pkg-config --libs glib-2.0` -lnetfilter_queue
+CFLAGS += `pkg-config --cflags $(PKGS)`
+LIBS += `pkg-config --libs $(PKGS)` -lnetfilter_queue
 
 all: example main
 
